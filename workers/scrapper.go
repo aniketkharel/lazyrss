@@ -17,7 +17,6 @@ func Start_scrapping() {
 		"https://www.9news.com.au/victoria/rss",
 		"https://news.ycombinator.com/rss",
 	}
-
 	for _, v := range urls {
 		wg.Add(1)
 		go go_to_url(v, &wg)
@@ -32,6 +31,9 @@ func go_to_url(url string, wg *sync.WaitGroup) {
 		log.Fatal(err)
 	}
 	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
 	defer res.Body.Close()
 	var feeds models.FeedXML
 	err = xml.Unmarshal(body, &feeds)
