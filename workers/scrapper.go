@@ -2,7 +2,6 @@ package workers
 
 import (
 	"encoding/xml"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -11,7 +10,7 @@ import (
 	"github.com/aniketkharel/rssreader/models"
 )
 
-func Start_scrapping() {
+func Start_scrapping(data chan models.FeedXML) {
 	var wg sync.WaitGroup
 	var urls = []string{
 		"https://www.9news.com.au/victoria/rss",
@@ -19,12 +18,13 @@ func Start_scrapping() {
 	}
 	for _, v := range urls {
 		wg.Add(1)
-		go go_to_url(v, &wg)
+		go go_to_url(v, &wg, data)
 	}
 	wg.Wait()
 }
 
-func go_to_url(url string, wg *sync.WaitGroup) {
+func go_to_url(url string, wg *sync.WaitGroup, data chan models.FeedXML) {
+	defer wg.Done()
 	client := http.Client{}
 	res, err := client.Get(url)
 	if err != nil {
@@ -40,6 +40,5 @@ func go_to_url(url string, wg *sync.WaitGroup) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(feeds)
-	defer wg.Done()
+	data <- feeds
 }
