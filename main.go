@@ -1,33 +1,16 @@
 package main
 
 import (
-	"log"
-	"os"
-	"sync"
-
-	"gioui.org/app"
-	"gioui.org/op"
-	"gioui.org/widget/material"
 	"github.com/aniketkharel/rssreader/models"
-	"github.com/aniketkharel/rssreader/ui"
 	"github.com/aniketkharel/rssreader/workers"
+	"sync"
 )
 
 func main() {
-	go func() {
-		window := new(app.Window)
-		window.Option(app.Size(340, 600))
-		window.Option(app.Title("lazyrss"))
-		err := run(window)
-		if err != nil {
-			log.Fatal(err)
-		}
-		os.Exit(0)
-	}()
-	app.Main()
+	run()
 }
 
-func run(window *app.Window) error {
+func run() {
 	data := make(chan models.FeedXML)
 	var wg sync.WaitGroup
 	wg.Add(1)
@@ -43,22 +26,7 @@ func run(window *app.Window) error {
 	for feed := range data {
 		feedList = append(feedList, feed)
 	}
-	theme := material.NewTheme()
-	list := ui.NewsFeedList()
-	var ops op.Ops
-	for {
-		switch e := window.Event().(type) {
-		case app.DestroyEvent:
-			return e.Err
-		case app.FrameEvent:
-			gtx := app.NewContext(&ops, e)
-			if len(feedList) == 0 {
-				progress := material.ProgressBar(theme, 0.2)
-				progress.Layout(gtx)
-			} else {
-				list.Layout(theme, gtx, &feedList)
-			}
-			e.Frame(gtx.Ops)
-		}
+	for _, v := range feedList {
+		println(v.Channel.Title)
 	}
 }
