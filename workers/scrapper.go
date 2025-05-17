@@ -7,20 +7,21 @@ import (
 	"net/http"
 	"sync"
 
+	"github.com/aniketkharel/rssreader/filesys"
 	"github.com/aniketkharel/rssreader/models"
 )
 
 func Start_scrapping(data chan models.FeedXML) {
 	var wg sync.WaitGroup
-	var urls = []string{
-		"https://www.9news.com.au/victoria/rss",
-		"https://news.ycombinator.com/rss",
+	configs := filesys.Load_config()
+	if len(configs.Urls) > 0 {
+		for _, v := range configs.Urls {
+			wg.Add(1)
+			go go_to_url(v, &wg, data)
+		}
+		wg.Wait()
 	}
-	for _, v := range urls {
-		wg.Add(1)
-		go go_to_url(v, &wg, data)
-	}
-	wg.Wait()
+	return
 }
 
 func go_to_url(url string, wg *sync.WaitGroup, data chan models.FeedXML) {

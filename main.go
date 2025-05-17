@@ -1,16 +1,25 @@
 package main
 
 import (
-	"github.com/aniketkharel/rssreader/models"
-	"github.com/aniketkharel/rssreader/workers"
 	"sync"
+	"time"
+
+	"github.com/aniketkharel/rssreader/models"
+	"github.com/aniketkharel/rssreader/ui"
+	"github.com/aniketkharel/rssreader/workers"
+	"github.com/briandowns/spinner"
+	"github.com/fatih/color"
 )
 
+var s = spinner.New(spinner.CharSets[9], 100*time.Millisecond)
+
 func main() {
+	//fmt.Println(len(os.Args), os.Args)
 	run()
 }
 
 func run() {
+	s.Start()
 	data := make(chan models.FeedXML)
 	var wg sync.WaitGroup
 	wg.Add(1)
@@ -22,11 +31,9 @@ func run() {
 		wg.Wait()
 		close(data)
 	}()
-	var feedList []models.FeedXML
-	for feed := range data {
-		feedList = append(feedList, feed)
-	}
-	for _, v := range feedList {
-		println(v.Channel.Title)
+	s.Stop()
+	for v := range data {
+		// items = v.Channel.Items
+		color.Green(ui.Format_Channel_Info(v))
 	}
 }
