@@ -21,7 +21,6 @@ func Start_scrapping(data chan models.FeedXML) {
 		}
 		wg.Wait()
 	}
-	return
 }
 
 func go_to_url(url string, wg *sync.WaitGroup, data chan models.FeedXML) {

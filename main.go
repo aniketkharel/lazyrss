@@ -1,20 +1,17 @@
 package main
 
 import (
-	"sync"
-	"time"
-
 	"github.com/aniketkharel/rssreader/models"
 	"github.com/aniketkharel/rssreader/ui"
 	"github.com/aniketkharel/rssreader/workers"
 	"github.com/briandowns/spinner"
-	"github.com/fatih/color"
+	"sync"
+	"time"
 )
 
 var s = spinner.New(spinner.CharSets[9], 100*time.Millisecond)
 
 func main() {
-	//fmt.Println(len(os.Args), os.Args)
 	run()
 }
 
@@ -33,7 +30,9 @@ func run() {
 	}()
 	s.Stop()
 	for v := range data {
-		// items = v.Channel.Items
-		color.Green(ui.Format_Channel_Info(v))
+		s.Start()
+		items := v.Channel.Items
+		ui.Format_FeedItem_Info(&items)
+		s.Stop()
 	}
 }
