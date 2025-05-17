@@ -44,6 +44,7 @@ func run(window *app.Window) error {
 		feedList = append(feedList, feed)
 	}
 	theme := material.NewTheme()
+	list := ui.NewsFeedList()
 	var ops op.Ops
 	for {
 		switch e := window.Event().(type) {
@@ -51,7 +52,12 @@ func run(window *app.Window) error {
 			return e.Err
 		case app.FrameEvent:
 			gtx := app.NewContext(&ops, e)
-			ui.Construct_List(theme, gtx, feedList)
+			if len(feedList) == 0 {
+				progress := material.ProgressBar(theme, 0.2)
+				progress.Layout(gtx)
+			} else {
+				list.Layout(theme, gtx, &feedList)
+			}
 			e.Frame(gtx.Ops)
 		}
 	}
